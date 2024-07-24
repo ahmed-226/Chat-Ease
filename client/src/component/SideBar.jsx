@@ -5,12 +5,13 @@ import { FaUserPlus } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
 import Avatar from './Avatar.jsx';
 import { useSelector } from 'react-redux';
+import EditProfile from './EditProfile.jsx';
 
 
 const SideBar = () => {
 
   const user = useSelector(state => state?.user)
-  const [editUserOpen , setEditUserOpen] = useState(false)
+  
 
 
   return (
@@ -27,7 +28,7 @@ const SideBar = () => {
             </NavLink>
         </div>
         <div className='flex flex-col items-center'>
-        <button className='mx-auto' onClick={()=>{setEditUserOpen(true)}}>
+        <button className='mx-auto' >
                         <Avatar
 
                             width={35}
@@ -43,6 +44,7 @@ const SideBar = () => {
           </button>
         </div>
       </div>
+      
     </div>
   )
 }
