@@ -84,7 +84,8 @@ const login = async (req,res) => {
         
         const cookiesOptions={
             httpOnly:true,
-            secure: process.env.NODE_ENV === "production"
+            secure: "production",
+            sameSite: 'strict'
         }
         
         
@@ -110,10 +111,11 @@ const userDetials=async (req, res) => {
 
 
         const token = req.cookies.token || ""
+        console.log(token);
 
         const user=await verifyToken(token)
 
-        if (user._id) {
+        if (user.id) {
 
             
             return res.status(200).json({

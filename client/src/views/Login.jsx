@@ -7,6 +7,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import uploadFile from '../helpers/uploadFile';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { setToken } from '../redux/userSlice';
 
 const Login = () => {
 
@@ -15,6 +17,7 @@ const Login = () => {
     password: ""
   });
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
 
   const handleOnChange = (e) => {
@@ -32,8 +35,13 @@ const Login = () => {
     e.stopPropagation();
     try{
       const url='http://localhost:4000/api/login'
-      const response=await axios.post(url,data)
+      const response=await axios.post(url,data, { withCredentials: true })
       toast.success(response?.data?.message)
+
+      if(response.data.success){
+        dispatch(setToken(response?.data?.token))
+        localStorage.setItem('token',response?.data?.token)
+      }
       
       if(response.data.success){
         setData({
@@ -50,9 +58,11 @@ const Login = () => {
     console.log(data);
   }
 
+  
+
   return (
     <>
-      <img src="/auth-img.9302755e73810f6c27d2.png" alt="myImage" style={{ position: 'absolute', width: "800px", bottom: "0px" }} />
+      <img src="/auth-img.9302755e73810f6c27d2.png" alt="myImage" className="absolute w-[800px] bottom-0" />
       <div className='500 h-[100vh] flex justify-end ' style={{ backgroundColor: "rgb(78 ,172, 109)" }}>
         <div>
           <div
@@ -96,6 +106,15 @@ const Login = () => {
                       required
                       className='w-full p-2 border border-gray-300 rounded-lg' />
                   </div>
+                  <div 
+                      className='flex justify-between items-center'
+                    >
+                    <Link
+                      to={"/forgot-password"}
+                      className=' hover:text-green-500 hover:underline'
+                    >Forgot Password ?</Link>
+                  </div>
+
 
                   <button type='submit' className='mt-5 h-[50px] w-full py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg'>Login</button>
                 </form>

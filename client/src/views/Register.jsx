@@ -78,7 +78,7 @@ const Register = () => {
 
   return (
     <>
-      <img src="/auth-img.9302755e73810f6c27d2.png" alt="myImage" style={{ position: 'absolute', width: "800px", bottom: "0px" }} />
+      <img src="/auth-img.9302755e73810f6c27d2.png" alt="myImage" className="absolute w-[800px] bottom-0"  />
       <div className='500 h-[100vh] flex justify-end ' style={{ backgroundColor: "rgb(78 ,172, 109)" }}>
         <div>
           <div
