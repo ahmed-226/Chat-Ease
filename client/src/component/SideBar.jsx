@@ -6,11 +6,26 @@ import { NavLink } from 'react-router-dom';
 import Avatar from './Avatar.jsx';
 import { useDispatch, useSelector } from 'react-redux';
 import EditProfile from './EditProfile.jsx';
-import { editProfileOpen } from '../redux/userSlice.js';
+import { editProfileOpen, logout } from '../redux/userSlice.js';
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
 const SideBar = () => {
   const user = useSelector(state => state?.user)
   const dispatch = useDispatch()
+
+  const handleLogout =async () => {
+    try{
+      const url='http://localhost:4000/api/logout'
+      const response=await axios.get(url, { withCredentials: true })
+      if(response.data.success){
+        dispatch(logout())
+        Cookies.remove('token')
+      }
+    }catch(error){
+      console.log(error)
+    }
+  }
 
   return (
     <div className='w-full h-full'>
@@ -27,7 +42,7 @@ const SideBar = () => {
           <button className='mx-auto' onClick={() => { dispatch(editProfileOpen({ editProfile: true })) }}> {/* Corrected line */}
           <Avatar width={35} height={35} name={user?.name} imageUrl={user?.profile_pic} />
           </button>
-          <button className='w-12 h-12 hover:bg-green-300 text-green-600 flex justify-center items-center '>
+          <button className='w-12 h-12 hover:bg-green-300 text-green-600 flex justify-center items-center ' onClick={handleLogout}>
             <IoIosLogOut size={25} />
           </button>
         </div>
