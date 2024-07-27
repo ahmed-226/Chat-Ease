@@ -11,9 +11,10 @@ const Home = () => {
 
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
+  const editProfile= useSelector(state => state.editProfile)
   console.log('dummy console', user)
   const navigate = useNavigate()
-  const [editUserOpen, setEditUserOpen] = useState(true)
+  
 
   const fetchUserDetails = async (req, res) => {
     try {
@@ -47,7 +48,7 @@ const Home = () => {
   return (
     <div className='bg-slate-400 grid lg:grid-cols-[400px,1fr] h-screen max-h-screen'>
       <section className='bg-white'>
-        {!editUserOpen ? (
+        {!editProfile ? (
           <SideBar />
         ) : (
           <EditProfile user={user} />

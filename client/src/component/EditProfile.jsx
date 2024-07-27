@@ -3,6 +3,7 @@ import Avatar from './Avatar'
 import { MdOutlineEdit } from "react-icons/md";
 import uploadFile from '../helpers/uploadFile';
 
+
 const EditProfile = ({ user }) => {
 
     const [data, setData] = useState({
@@ -10,6 +11,7 @@ const EditProfile = ({ user }) => {
         profile_pic: user?.profile_pic
     })
     const [uploadPhoto, setUploadPhoto] = useState("")
+    
 
     useEffect(() => {
         setData((preve) => {
@@ -52,7 +54,7 @@ const EditProfile = ({ user }) => {
 
     return (
         <div className=' bg-slate-200 w-full h-full flex flex-col items-center'>
-            <div className=' p-12 bg-slate-300 w-full flex justify-center'>
+            <div className=' p-12 bg-slate-300 w-full flex justify-center' >
                 <Avatar
                     width={150}
                     height={150}
