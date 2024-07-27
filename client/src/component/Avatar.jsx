@@ -32,9 +32,8 @@ const Avatar = ({userId,name,imageUrl,width,height}) => {
       "bg-sky-200",
       "bg-blue-200"
     ]
-    const seed = 'mySeed';
 
-    const randomNumber = Math.floor(seedrandom(seed) * 9)
+    const randomNumber = Math.floor(Math.random() * 9)
 
     // const isOnline = onlineUser.includes(userId)
   return (
@@ -50,13 +49,14 @@ const Avatar = ({userId,name,imageUrl,width,height}) => {
                 />
             ) : (
                 name ? (
-                    <div  style={{width : width+"px", height : height+"px",fontSize:(width-50)+"px" }} className={`overflow-hidden rounded-full flex justify-center items-center ${bgColor[randomNumber]}`}>
+                    <div  style={{width : width+"px", height : height+"px",fontSize:(width-50)+"px" }} className={`overflow-hidden rounded-full flex justify-center items-center border border-[2px] border-white  ${bgColor[randomNumber]}`}>
                         {avatarName}
                     </div>
                 ) :(
                   <PiUserCircle
+                    
                     size={width}
-                  />
+                    />
                 )
             )
         }

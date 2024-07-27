@@ -6,7 +6,7 @@ const initialState = {
   email : "",
   profile_pic : "",
   token : "",
-  editprofile:false
+  editProfile: false
 }
 
 export const userSlice = createSlice({
@@ -29,14 +29,14 @@ export const userSlice = createSlice({
         state.profile_pic = ""
         state.token = ""
     },
-    editProfile:(state,action)=>{
-        state.editProfile=action.payload.editProfile
-    }
+    editProfileOpen: (state, action) => {
+      state.editProfile = action.payload.editProfile;
+  }
 
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setUser, setToken ,logout,editProfile } = userSlice.actions
+export const { setUser, setToken ,logout,editProfileOpen } = userSlice.actions
 
 export default userSlice.reducer

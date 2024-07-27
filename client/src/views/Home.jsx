@@ -6,15 +6,12 @@ import { useNavigate } from 'react-router-dom'
 import SideBar from '../component/SideBar'
 import EditProfile from '../component/EditProfile.jsx'
 
-
 const Home = () => {
-
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
-  const editProfile= useSelector(state => state.editProfile)
+  const editProfile = useSelector(state => state.user.editProfile) // Corrected line
   console.log('dummy console', user)
   const navigate = useNavigate()
-  
 
   const fetchUserDetails = async (req, res) => {
     try {
@@ -44,18 +41,15 @@ const Home = () => {
     fetchUserDetails()
   }, [])
 
-
   return (
-    <div className='bg-slate-400 grid lg:grid-cols-[400px,1fr] h-screen max-h-screen'>
-      <section className='bg-white'>
+    <div className='bg-green-300 grid lg:grid-cols-[400px,1fr] h-screen max-h-screen' >
+      <section className='bg-white ' >
         {!editProfile ? (
           <SideBar />
         ) : (
-          <EditProfile user={user} />
-
+          <EditProfile user={user}  />
         )}
       </section>
-    
     </div>
   )
 }
