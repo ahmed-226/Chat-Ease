@@ -185,7 +185,33 @@ const updateUser=async (req, res) => {
  
 }
 
-module.exports = { register, login, userDetials,logout, updateUser }
+const searchUser = async (req, res) => {
+    try {
+        const { search } = req.body;
+        const query = new RegExp(search, "i");
+
+        const users = await User.find({
+            $or: [
+                { name: query },
+                { email: query }
+            ]
+        }).select('-password');
+
+        return res.status(200).json({
+            message: "User found",
+            data: users,
+            success: true
+        });
+
+    } catch (error) {
+        return res.status(400).json({
+            message: error.message || error,
+            error: true
+        });
+    }
+};
+
+module.exports = { register, login, userDetials,logout, updateUser ,searchUser}
 
 
 

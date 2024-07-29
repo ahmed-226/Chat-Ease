@@ -2,16 +2,20 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout, setUser } from '../redux/userSlice'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import SideBar from '../component/SideBar'
 import EditProfile from '../component/EditProfile.jsx'
+import Chat from '../component/Chat.jsx'
 
 const Home = () => {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
   const editProfile = useSelector(state => state.user.editProfile) // Corrected line
-  console.log('dummy console', user)
   const navigate = useNavigate()
+  const location=useLocation()
+
+
+  console.log('location: ' + location.pathname);
 
   const fetchUserDetails = async (req, res) => {
     try {
@@ -31,7 +35,7 @@ const Home = () => {
         navigate('/login')
       }
 
-      console.log('user details', response)
+      
     } catch (err) {
       console.log(err)
     }
@@ -40,6 +44,8 @@ const Home = () => {
   useEffect(() => {
     fetchUserDetails()
   }, [])
+
+  const basePath=location.pathname==='/'
 
   return (
     <div className='bg-green-300 grid lg:grid-cols-[400px,1fr] h-screen max-h-screen' >
@@ -50,6 +56,11 @@ const Home = () => {
           <EditProfile user={user}  />
         )}
       </section>
+
+      <section className={`${basePath && "hidden"}`}>
+        <Outlet />
+      </section>
+   
     </div>
   )
 }
