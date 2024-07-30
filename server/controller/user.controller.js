@@ -111,7 +111,7 @@ const userDetials=async (req, res) => {
 
 
         const token = req.cookies.token || ""
-        console.log(token);
+        // console.log(token);
 
         const user=await verifyToken(token)
 

@@ -43,7 +43,7 @@ const SideBar = () => {
         </div>
         <div className='flex flex-col items-center'>
           <button className='mx-auto mb-2' onClick={() => { dispatch(editProfileOpen({ editProfile: true })) }}> {/* Corrected line */}
-            <Avatar width={35} height={35} name={user?.name} imageUrl={user?.profile_pic} />
+            <Avatar width={35} height={35} name={user?.name} imageUrl={user?.profile_pic} userId={user?._id}/>
           </button>
           <button className='w-12 h-12 hover:bg-green-300 text-green-600 flex justify-center items-center ' onClick={handleLogout}>
             <IoIosLogOut size={25} />

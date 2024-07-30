@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, setUser } from '../redux/userSlice'
+import { logout, setUser,setOnLineUsers } from '../redux/userSlice'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import SideBar from '../component/SideBar'
 import EditProfile from '../component/EditProfile.jsx'
 import Chat from '../component/Chat.jsx'
+import io from 'socket.io-client'
 
 const Home = () => {
   const dispatch = useDispatch()
@@ -15,7 +16,6 @@ const Home = () => {
   const location=useLocation()
 
 
-  console.log('location: ' + location.pathname);
 
   const fetchUserDetails = async (req, res) => {
     try {
@@ -43,6 +43,23 @@ const Home = () => {
 
   useEffect(() => {
     fetchUserDetails()
+  }, [])
+
+  useEffect(() => {
+    const socketConnections =io('http://localhost:4000',{
+      auth: {
+        token:localStorage.getItem('token')
+      }
+    })
+
+    socketConnections.on('onlineUsers', (data) => {
+      console.log(data)
+      dispatch(setOnLineUsers(data))
+    })
+
+    return () => {
+      socketConnections.disconnect()
+    }
   }, [])
 
   const basePath=location.pathname==='/'

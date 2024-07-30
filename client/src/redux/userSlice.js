@@ -1,42 +1,46 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  _id : "",
-  name : "",
-  email : "",
-  profile_pic : "",
-  token : "",
-  editProfile: false
+  _id: "",
+  name: "",
+  email: "",
+  profile_pic: "",
+  token: "",
+  editProfile: false,
+  onlineUsers: [],
 }
 
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser : (state,action)=>{
-        state._id = action.payload._id
-        state.name = action.payload.name 
-        state.email = action.payload.email 
-        state.profile_pic = action.payload.profile_pic 
+    setUser: (state, action) => {
+      state._id = action.payload._id
+      state.name = action.payload.name
+      state.email = action.payload.email
+      state.profile_pic = action.payload.profile_pic
     },
-    setToken : (state,action)=>{
-        state.token = action.payload
+    setToken: (state, action) => {
+      state.token = action.payload
     },
-    logout : (state,action)=>{
-        state._id = ""
-        state.name = ""
-        state.email = ""
-        state.profile_pic = ""
-        state.token = ""
+    logout: (state, action) => {
+      state._id = ""
+      state.name = ""
+      state.email = ""
+      state.profile_pic = ""
+      state.token = ""
     },
     editProfileOpen: (state, action) => {
       state.editProfile = action.payload.editProfile;
-  }
+    },
+    setOnLineUsers: (state, action) => {
+      state.onlineUsers = action.payload;
+    },
 
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setUser, setToken ,logout,editProfileOpen } = userSlice.actions
+export const { setUser, setToken, setOnLineUsers,logout, editProfileOpen } = userSlice.actions
 
 export default userSlice.reducer
