@@ -2,6 +2,8 @@ const express = require('express');
 const http = require('http');
 const {Server} = require('socket.io');
 const verifyToken = require('../helpers/verfiyToken');
+const { log } = require('console');
+const User = require('../models/user.model');
 
 const app = express();
 const server=http.createServer(app);
@@ -27,9 +29,24 @@ io.on('connection',async (socket) => {
 
     // console.log(user);
     socket.join(user?._id)
-    onlineUsers.add(user?._id)
+    onlineUsers.add(user?._id?.toString())
 
     io.emit('onlineUsers',Array.from(onlineUsers))
+
+    io.on('chat-page',async(userId)=>{
+        log('chat page',userId)
+        const userDetails = await User.findById(userId).select('-password')
+        const payload={
+            _id: userDetails._id,
+            name:userDetails.name,
+            email:userDetails.email,
+            online:onlineUsers.has(userId)
+
+        }
+
+        socket.emit('chat-user',payload||'fff')
+    })
+
 
     // Handle 'disconnect' event
     socket.on('disconnect', () => {

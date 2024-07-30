@@ -8,6 +8,7 @@ const initialState = {
   token: "",
   editProfile: false,
   onlineUsers: [],
+  socketConnections: null,
 }
 
 export const userSlice = createSlice({
@@ -36,6 +37,9 @@ export const userSlice = createSlice({
     setOnLineUsers: (state, action) => {
       state.onlineUsers = action.payload;
     },
+    setSocketConnections: (state, action) => {
+      state.socketConnections = action.payload;
+    }
 
   },
 })
