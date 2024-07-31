@@ -7,29 +7,26 @@ const userRouter= require('./routes/user.routes.js')
 const cookieParser = require('cookie-parser')
 const { app, server} = require('./socket/socket.js')
 
-dotenv.config()
-
-// const app = express()
-
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true
+    origin : process.env.FRONTEND_URL,
+    credentials : true
 }))
 app.use(express.json())
 app.use(cookieParser())
 
+const PORT = process.env.PORT || 8080
 
-app.get('/', () => {
-    console.log('hello')
-})
-app.use('/api', userRouter)
-
-
-
-connectDB().then(() => {
-    server.listen(port, () => {
-      console.log(`app listening on port ${port}`)
+app.get('/',(request,response)=>{
+    response.json({
+        message : "Server running at " + PORT
     })
 })
 
+//api endpoints
+app.use('/api',userRouter)
 
+connectDB().then(()=>{
+    server.listen(PORT,()=>{
+        console.log("server running at " + PORT)
+    })
+})

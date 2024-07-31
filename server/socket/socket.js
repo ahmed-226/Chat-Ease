@@ -26,6 +26,7 @@ io.on('connection',async (socket) => {
     const token =socket.handshake.auth.token 
 
     const user=await verifyToken(token)
+    
 
     // console.log(user);
     socket.join(user?._id)
@@ -33,18 +34,18 @@ io.on('connection',async (socket) => {
 
     io.emit('onlineUsers',Array.from(onlineUsers))
 
-    io.on('chat-page',async(userId)=>{
-        log('chat page',userId)
-        const userDetails = await User.findById(userId).select('-password')
-        const payload={
-            _id: userDetails._id,
-            name:userDetails.name,
-            email:userDetails.email,
-            online:onlineUsers.has(userId)
-
+    socket.on('chat-page',async(userId)=>{
+        console.log('userId',userId)
+        const userDetails = await User.findById(userId).select("-password")
+        
+        const payload = {
+            _id : userDetails?._id,
+            name : userDetails?.name,
+            email : userDetails?.email,
+            profile_pic : userDetails?.profile_pic,
+            online : onlineUsers.has(userId)
         }
-
-        socket.emit('chat-user',payload||'fff')
+        socket.emit('chat-user',payload)
     })
 
 
