@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, setUser,setOnLineUsers } from '../redux/userSlice'
+import { logout, setUser,setOnLineUsers,setSocketConnections } from '../redux/userSlice'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import SideBar from '../component/SideBar'
 import EditProfile from '../component/EditProfile.jsx'
@@ -56,6 +56,9 @@ const Home = () => {
       console.log(data)
       dispatch(setOnLineUsers(data))
     })
+
+
+    dispatch(setSocketConnections(socketConnections))
 
     return () => {
       socketConnections.disconnect()
