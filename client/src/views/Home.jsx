@@ -68,7 +68,7 @@ const Home = () => {
   const basePath=location.pathname==='/'
 
   return (
-    <div className='bg-green-300 grid lg:grid-cols-[400px,1fr] h-screen max-h-screen' >
+    <div className='bg-green-300 grid grid-cols-[400px,1fr] h-screen max-h-screen' >
       <section className='bg-white ' >
         {!editProfile ? (
           <SideBar />
@@ -77,7 +77,7 @@ const Home = () => {
         )}
       </section>
 
-      <section className={`${basePath && "hidden"}`}>
+      <section className={`${basePath && "hidden"} `}>
         <Outlet />
       </section>
    

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+// const Message = require('./message.model.js')
 
 const conversersationSchema= new mongoose.Schema({
 
@@ -12,44 +13,20 @@ const conversersationSchema= new mongoose.Schema({
         required: true,
         ref: 'User'
     },
-    message: [
+    messages: [
         {
             type: mongoose.Schema.Types.ObjectId,
             default: '',
-            ref: 'Message'
+            ref: 'Message' 
         }
-    ],
-
-}, {
-    timestamps: true
-})
-
-const messageSchema = new mongoose.Schema({
-    text: {
-        type: String,
-        required: true,
-    },
-    ImageUrl: {
-        type: String,
-        default: ''
-    },
-    videoUrl:{
-        type: String,
-        default: ''
-    },
-    seen:{
-        type:Boolean,
-        default: false
-    }
+    ]
+    
 
 }, {
     timestamps: true
 })
 
 
-
-const Message = mongoose.model('Message', messageSchema)
-module.exports = Message
 
 const Conversation = mongoose.model('Conversation', conversersationSchema)
 module.exports = Conversation
