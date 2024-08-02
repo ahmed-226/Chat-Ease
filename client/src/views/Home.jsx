@@ -53,7 +53,7 @@ const Home = () => {
     })
 
     socketConnections.on('onlineUsers', (data) => {
-      console.log(data)
+      // console.log(data)
       dispatch(setOnLineUsers(data))
     })
 

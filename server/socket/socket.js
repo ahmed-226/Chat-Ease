@@ -6,7 +6,7 @@ const { log } = require('console');
 const User = require('../models/user.model');
 const Conversation = require('../models/conversation.model');
 const Message = require('../models/message.model');
-const getConversation=require('../helpers/getConverstation.js')
+const getConversation = require('../helpers/getConverstation.js')
 
 const app = express();
 const server = http.createServer(app);
@@ -50,13 +50,13 @@ io.on('connection', async (socket) => {
         socket.emit('chat-user', payload)
 
         const getConversationMessage = await Conversation.findOne({
-            "$or" : [
-                { sender : user?._id, receiver : userId },
-                { sender : userId, receiver :  user?._id}
+            "$or": [
+                { sender: user?._id, receiver: userId },
+                { sender: userId, receiver: user?._id }
             ]
-        }).populate('messages').sort({ updatedAt : -1 })
+        }).populate('messages').sort({ updatedAt: -1 })
 
-        socket.emit('message',getConversationMessage?.messages || [])
+        socket.emit('message', getConversationMessage?.messages || [])
 
     })
 
@@ -67,7 +67,7 @@ io.on('connection', async (socket) => {
                 { sender: message?.sender, receiver: message?.receiver },
                 { sender: message?.receiver, receiver: message?.sender }
             ]
-        })    
+        })
 
         if (!Conversations) {
             const newConversation = new Conversation({
@@ -86,7 +86,7 @@ io.on('connection', async (socket) => {
 
         const savaMessage = await messages.save()
 
-        const updateConversation = await Conversation.findByIdAndUpdate({_id:Conversations?._id}, {
+        const updateConversation = await Conversation.findByIdAndUpdate({ _id: Conversations?._id }, {
             $push: { messages: savaMessage?._id }
         })
 
@@ -95,24 +95,54 @@ io.on('connection', async (socket) => {
                 { sender: message?.sender, receiver: message?.receiver },
                 { sender: message?.receiver, receiver: message?.sender }
             ]
-        }).populate('messages').sort({updateAt:-1})
+        }).populate('messages').sort({ updateAt: -1 })
 
-        io.to(message?.sender).emit('message',getConversationMessages.messages || [])
-        io.to(message?.receiver).emit('message',getConversationMessages.messages || [])
- 
-        // console.log('getConversation', getConversation);
+        io.to(message?.sender).emit('message', getConversationMessages.messages || [])
+        io.to(message?.receiver).emit('message', getConversationMessages.messages || [])
+
+        const converstationSender = await getConversation(message.sender)
+        const converstationReceiver = await getConversation(message.receiver)
+
+        io.to(message?.sender).emit('conversation', converstationSender)
+        io.to(message?.receiver).emit('conversation', converstationReceiver)
+
     })
 
-    socket.on('sidebar',async(currentUserId)=>{
-        console.log("current user",currentUserId)
 
-        const conversation = await getConversation(currentUserId)
 
-        socket.emit('conversation',conversation)
+    socket.on('sidebar', async (currentUserId) => {
+        console.log("current user", currentUserId)
+
+        const conversationSideBar = await getConversation(currentUserId)
+        socket.emit('conversation', conversationSideBar)
+
+    })
+
+    socket.on('seen',async(msgByUserId)=>{
         
+        let conversation = await Conversation.findOne({
+            "$or" : [
+                { sender : user?._id, receiver : msgByUserId },
+                { sender : msgByUserId, receiver :  user?._id}
+            ]
+        })
+
+        const conversationMessageId = conversation?.messages || []
+
+        const updateMessages  = await Message.updateMany(
+            { _id : { "$in" : conversationMessageId }, msgByUserId : msgByUserId },
+            { "$set" : { seen : true }}
+        )
+
+        //send conversation
+        const conversationSender = await getConversation(user?._id?.toString())
+        const conversationReceiver = await getConversation(msgByUserId)
+
+        io.to(user?._id?.toString()).emit('conversation',conversationSender)
+        io.to(msgByUserId).emit('conversation',conversationReceiver)
     })
 
-    
+
 
 
 

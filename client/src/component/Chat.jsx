@@ -71,20 +71,22 @@ const Chat = () => {
     })
   }
 
-  console.log(socketConnections || 'no');
+  // console.log(socketConnections || 'no');
 
   useEffect(() => {
     if (socketConnections) {
       socketConnections.emit('chat-page', params.userId)
 
+      socketConnections.emit('seen',params.userId)
+
       socketConnections.on('chat-user', (data) => {
-        console.log("user details", data || "JSON.stringify(hola)");
+        // console.log("user details", data || "JSON.stringify(hola)");
         setDataUser(data)
       })
 
-      socketConnections.on('message', (data) => {
-        console.log('message data', data);
-      })
+      // socketConnections.on('message', (data) => {
+      //   // console.log('message data', data);
+      // })
 
     }
   }, [socketConnections, params?.userId])
@@ -169,7 +171,7 @@ const Chat = () => {
       })
 
       socketConnections.on('message', (data) => {
-        console.log('message data', data)
+        // console.log('message data', data)
         setAllMessage(data)
       })
 
@@ -182,7 +184,7 @@ const Chat = () => {
       <div style={{ backgroundImage: `url('/wallapaper.jpeg')` }} className='bg-no-repeat bg-cover'>
         <header className='sticky top-0 h-16 bg-white flex justify-between items-center px-4'>
           <div className='flex items-center gap-4'>
-            <Link to={"/home"} className='lg:hidden'>
+            <Link to={"/home"} >
               <FaAngleLeft size={25} />
             </Link>
             <Avatar
@@ -212,7 +214,7 @@ const Chat = () => {
             {
               allMessage.map((msg, index) => {
                 return (
-                  <div className={` p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-lg ${user._id === msg?.msgByUserId ? "ml-auto bg-teal-100" : "bg-white"}`}>
+                  <div key={msg?.msgByUserId } className={` p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-lg ${user._id === msg?.msgByUserId ? "ml-auto bg-teal-100" : "bg-white"}`}>
                     <div className='w-full relative'>
                       {
                         msg?.imageUrl && (

@@ -8,10 +8,17 @@ import Register from './views/Register.jsx';
 import Home from './views/Home.jsx';
 import Login from './views/Login.jsx';
 import Forgotpassword from './views/Forgotpassword.jsx';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { store } from './redux/store.js';
 import Chat from './component/Chat.jsx';
 import Cookies from 'js-cookie';
+
+
+
+
+const auth=localStorage.getItem('token')
+
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -23,7 +30,7 @@ root.render(
             <Route path="register" element={<Register />} />
             <Route path="login" element={<Login />} />
             <Route path="forgot-password" element={<Forgotpassword />} />
-            <Route path="home" element={<Home />}>
+            <Route path="home" element={auth?<Home />:<Login />}>
               <Route path=":userId" element={<Chat />} />
             </Route>
           </Route>

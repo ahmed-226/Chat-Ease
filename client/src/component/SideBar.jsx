@@ -18,7 +18,7 @@ const SideBar = () => {
 
   const user = useSelector(state => state?.user)
   const [openSearchUser, setOpenSearchUser] = useState(false)
-  const socketConnections = useSelector(state => state?.user?.socketConnection)
+  const socketConnections = useSelector(state => state?.user?.socketConnections)
   const [allUser, setAllUser] = useState([])
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -36,14 +36,14 @@ const SideBar = () => {
       console.log(error)
     }
   }
-
+  
 
   useEffect(() => {
     if (socketConnections) {
       socketConnections.emit('sidebar', user._id)
 
       socketConnections.on('conversation', (data) => {
-        console.log('conversation', data)
+        // console.log('conversation', data)
 
         const conversationUserData = data.map((conversationUser, index) => {
           if (conversationUser?.sender?._id === conversationUser?.receiver?._id) {
@@ -83,7 +83,7 @@ const SideBar = () => {
 
         </div>
         <div className='flex flex-col items-center'>
-          <button className='mx-auto mb-2' onClick={() => { dispatch(editProfileOpen({ editProfile: true })) }}> {/* Corrected line */}
+          <button className='mx-auto mb-2' onClick={() => { dispatch(editProfileOpen({ editProfile: true })) }}> 
             <Avatar width={35} height={35} name={user?.name} imageUrl={user?.profile_pic} userId={user?._id} />
           </button>
           <button className='w-12 h-12 hover:bg-green-300 text-green-600 flex justify-center items-center ' onClick={handleLogout}>
@@ -124,13 +124,13 @@ const SideBar = () => {
               {
                 allUser.map((conv, index) => {
                   return (
-                    <NavLink to={"/" + conv?.userDetails?._id} key={conv?._id} className='flex items-center gap-2 py-3 px-2 border border-transparent hover:border-primary rounded hover:bg-slate-100 cursor-pointer'>
+                    <NavLink to={"/home/" + conv?.userDetails?._id} key={conv?._id} className='flex items-center gap-2 py-3 px-2 border border-transparent hover:border-primary rounded hover:bg-slate-100 cursor-pointer'>
                       <div>
                         <Avatar
                           imageUrl={conv?.userDetails?.profile_pic}
                           name={conv?.userDetails?.name}
-                          width={40}
-                          height={40}
+                          width={50}
+                          height={50} 
                         />
                       </div>
                       <div>
@@ -159,7 +159,7 @@ const SideBar = () => {
                       </div>
                       {
                         Boolean(conv?.unseenMsg) && (
-                          <p className='text-xs w-6 h-6 flex justify-center items-center ml-auto p-1 bg-primary text-white font-semibold rounded-full'>{conv?.unseenMsg}</p>
+                          <p className='text-xs w-6 h-6 flex justify-center items-center ml-auto mr-2 p-1 bg-primary text-white bg-green-700 font-semibold rounded-full'>{conv?.unseenMsg}</p>
                         )
                       }
 
