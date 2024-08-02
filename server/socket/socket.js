@@ -6,6 +6,7 @@ const { log } = require('console');
 const User = require('../models/user.model');
 const Conversation = require('../models/conversation.model');
 const Message = require('../models/message.model');
+const getConversation=require('../helpers/getConverstation.js')
 
 const app = express();
 const server = http.createServer(app);
@@ -47,6 +48,16 @@ io.on('connection', async (socket) => {
             online: onlineUsers.has(userId)
         }
         socket.emit('chat-user', payload)
+
+        const getConversationMessage = await Conversation.findOne({
+            "$or" : [
+                { sender : user?._id, receiver : userId },
+                { sender : userId, receiver :  user?._id}
+            ]
+        }).populate('messages').sort({ updatedAt : -1 })
+
+        socket.emit('message',getConversationMessage?.messages || [])
+
     })
 
     socket.on('new message', async (message) => {
@@ -90,6 +101,15 @@ io.on('connection', async (socket) => {
         io.to(message?.receiver).emit('message',getConversationMessages.messages || [])
  
         // console.log('getConversation', getConversation);
+    })
+
+    socket.on('sidebar',async(currentUserId)=>{
+        console.log("current user",currentUserId)
+
+        const conversation = await getConversation(currentUserId)
+
+        socket.emit('conversation',conversation)
+        
     })
 
     
