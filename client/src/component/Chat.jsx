@@ -77,7 +77,7 @@ const Chat = () => {
     if (socketConnections) {
       socketConnections.emit('chat-page', params.userId)
 
-      socketConnections.emit('seen',params.userId)
+      socketConnections.emit('seen', params.userId)
 
       socketConnections.on('chat-user', (data) => {
         // console.log("user details", data || "JSON.stringify(hola)");
@@ -214,7 +214,7 @@ const Chat = () => {
             {
               allMessage.map((msg, index) => {
                 return (
-                  <div key={msg?.msgByUserId } className={` p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-lg ${user._id === msg?.msgByUserId ? "ml-auto bg-teal-100" : "bg-white"}`}>
+                  <div key={msg?.msgByUserId} className={` p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-lg ${user._id === msg?.msgByUserId ? "ml-auto bg-teal-100" : "bg-white"}`}>
                     <div className='w-full relative'>
                       {
                         msg?.imageUrl && (
@@ -228,7 +228,7 @@ const Chat = () => {
                         msg?.videoUrl && (
                           <video
                             src={msg?.videoUrl}
-                            className='w-full h-full object-scale-down'
+                            className="w-full h-full object-scale-down border-2 border-gray-300 rounded-lg"
                             controls
                           />
                         )
