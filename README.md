@@ -1,8 +1,8 @@
 # Chat-Ease
 
 <div align="center">
-  <img src="assets/login.png" alt="Image 1" width="350" height="200"/>
-  <img src="assets/main.png" alt="Image 2" width="350" height="200"/>
+  <img src="assets/login.png" alt="Image 1"/>
+  <img src="assets/main.png" alt="Image 2"/>
 </div>
 
 
