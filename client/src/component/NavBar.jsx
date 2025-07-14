@@ -8,7 +8,6 @@ const NavBar = () => {
                     src='/logo.avif'
                     alt='logo'
                     width={130}
-                    // height={0}
                 />
             </header>
         </div>
