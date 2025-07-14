@@ -6,8 +6,6 @@ import seedrandom from 'seedrandom';
 const Avatar = ({userId,name,imageUrl,width,height}) => {
     const onlineUser = useSelector(state => state?.user?.onlineUsers)
 
-    //Amit Prajapati
-
     let avatarName = ""
 
     if(name){
@@ -15,9 +13,20 @@ const Avatar = ({userId,name,imageUrl,width,height}) => {
 
       if(splitName.length > 1){
         
-        avatarName = splitName[0][0].toUpperCase()+splitName[1][0].toUpperCase()
+        const firstName = splitName[0]?.[0]
+        const lastName = splitName[1]?.[0]
+        
+        if(firstName && lastName) {
+          avatarName = firstName.toUpperCase() + lastName.toUpperCase()
+        } else if(firstName) {
+          avatarName = firstName.toUpperCase()
+        }
       }else{
-        avatarName = splitName[0][0].toUpperCase()
+        
+        const firstName = splitName[0]?.[0]
+        if(firstName) {
+          avatarName = firstName.toUpperCase()
+        }
       }
     }
 
@@ -33,43 +42,66 @@ const Avatar = ({userId,name,imageUrl,width,height}) => {
       "bg-blue-200"
     ]
 
-    const randomNumber = Math.floor(Math.random() * 9)
+    
+    const getConsistentColor = () => {
+      if (userId) {
+        
+        const rng = seedrandom(userId);
+        return Math.floor(rng() * bgColor.length);
+      } else if (name) {
+        
+        const rng = seedrandom(name);
+        return Math.floor(rng() * bgColor.length);
+      }
+      return 0; 
+    };
 
-    const isOnline = onlineUser.includes(userId)
-  return (
-    <div className={`text-slate-800  rounded-full font-bold relative `} style={{width : width+"px", height : height+"px" }}>
-        {
-            imageUrl ? (
-                <img
-                    src={imageUrl}
-                    width={width}
-                    height={height}
-                    alt={name}
-                    className='overflow-hidden rounded-full'
-                />
-            ) : (
-                name ? (
-                    <div  style={{width : width+"px", height : height+"px",fontSize:(width-50)+"px" }} className={`overflow-hidden rounded-full flex justify-center items-center border border-[2px] border-white  ${bgColor[randomNumber]}`}>
-                        {avatarName}
-                    </div>
-                ) :(
-                  <PiUserCircle
-                    
-                    size={width}
-                    />
-                )
+    const colorIndex = getConsistentColor();
+    const isOnline = onlineUser?.includes(userId)
+
+    return (
+      <div className={`text-slate-800 rounded-full font-bold relative`} style={{width : width+"px", height : height+"px" }}>
+          {
+              imageUrl ? (
+                  <img
+                      src={imageUrl}
+                      width={width}
+                      height={height}
+                      alt={name || 'User avatar'}
+                      className='overflow-hidden rounded-full w-full h-full object-cover'
+                      onError={(e) => {
+                        console.log('Image failed to load:', imageUrl);
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                  />
+              ) : null
+          }
+          
+          {/* Fallback avatar with initials */}
+          {(!imageUrl || imageUrl === '') && name ? (
+              <div  
+                style={{
+                  width : width+"px", 
+                  height : height+"px",
+                  fontSize: Math.max((width-50), 12)+"px" 
+                }} 
+                className={`overflow-hidden rounded-full flex justify-center items-center border border-[2px] border-white ${bgColor[colorIndex]}`}
+              >
+                  {avatarName}
+              </div>
+          ) : (!imageUrl || imageUrl === '') && !name ? (
+              <PiUserCircle size={width} />
+          ) : null}
+
+          {
+            isOnline && (
+              <div className="bg-green-600 p-[5px] absolute bottom-2 -right-1 z-10 rounded-full"></div>
             )
-        }
-
-        {
-          isOnline && (
-            
-            <div className="bg-green-600 p-[5px] absolute bottom-2 -right-1 z-10 rounded-full"></div>
-          )
-        }
-      
-    </div>
-  )
+          }
+        
+      </div>
+    )
 }
 
 export default Avatar
