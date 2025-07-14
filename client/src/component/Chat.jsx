@@ -12,7 +12,9 @@ import { FaVideo } from "react-icons/fa6";
 import Loading from './Loading.jsx'
 import moment from 'moment'
 import { IoClose } from "react-icons/io5";
-import Modal from 'react-modal';;
+import Modal from 'react-modal';
+import EmojiPicker from 'emoji-picker-react';
+import { BsEmojiSmile } from "react-icons/bs";
 
 const Chat = () => {
 
@@ -37,14 +39,32 @@ const Chat = () => {
     online: false,
   })
   const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false)
+  const [openEmojiPicker, setOpenEmojiPicker] = useState(false)
   const [message, setMessage] = useState({
     text: "",
     imageUrl: "",
     videoUrl: ""
   })
 
+  
+  const [modalImage, setModalImage] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleUploadImageVideoOpen = () => {
     setOpenImageVideoUpload(preve => !preve)
+    setOpenEmojiPicker(false) 
+  }
+
+  const handleEmojiPickerOpen = () => {
+    setOpenEmojiPicker(preve => !preve)
+    setOpenImageVideoUpload(false) 
+  }
+
+  const handleEmojiClick = (emojiData) => {
+    setMessage(preve => ({
+      ...preve,
+      text: preve.text + emojiData.emoji
+    }))
   }
 
   const handleUploadImage = async (e) => {
@@ -71,8 +91,6 @@ const Chat = () => {
     })
   }
 
-  // console.log(socketConnections || 'no');
-
   useEffect(() => {
     if (socketConnections) {
       socketConnections.emit('chat-page', params.userId)
@@ -80,17 +98,10 @@ const Chat = () => {
       socketConnections.emit('seen', params.userId)
 
       socketConnections.on('chat-user', (data) => {
-        // console.log("user details", data || "JSON.stringify(hola)");
         setDataUser(data)
       })
-
-      // socketConnections.on('message', (data) => {
-      //   // console.log('message data', data);
-      // })
-
     }
   }, [socketConnections, params?.userId])
-
 
   const handleOnChange = (e) => {
     const { name, value } = e.target
@@ -101,7 +112,6 @@ const Chat = () => {
         text: value
       }
     })
-
   }
 
   const handleUploadVideo = async (e) => {
@@ -119,6 +129,7 @@ const Chat = () => {
       }
     })
   }
+
   const handleClearUploadVideo = () => {
     setMessage(preve => {
       return {
@@ -150,14 +161,15 @@ const Chat = () => {
     }
   }
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => {
+  
+  const openImageModal = (imageUrl) => {
+    setModalImage(imageUrl);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setModalImage(null);
   };
 
   useEffect(() => {
@@ -171,203 +183,289 @@ const Chat = () => {
       })
 
       socketConnections.on('message', (data) => {
-        // console.log('message data', data)
         setAllMessage(data)
       })
-
-
     }
   }, [socketConnections, params?.userId, user])
 
   return (
-    <>
-      <div style={{ backgroundImage: `url('/wallapaper.jpeg')` }} className='bg-no-repeat bg-cover'>
-        <header className='sticky top-0 h-16 bg-white flex justify-between items-center px-4'>
-          <div className='flex items-center gap-4'>
-            <Link to={"/home"} >
-              <FaAngleLeft size={25} />
-            </Link>
-            <Avatar
-              width={50}
-              height={50}
-              imageUrl={dataUser?.profile_pic}
-              name={dataUser?.name}
-              userId={dataUser?._id}
-            />
-            <div>
-              <h3 className='font-semibold text-lg my-0 text-ellipsis line-clamp-1'>{dataUser?.name}</h3>
-              <p className='-my-2 text-sm'>
-                {
-                  dataUser.online ? <span className='text-primary'>online</span> : <span className='text-slate-400'>offline</span>
-                }
-              </p>
-            </div>
+    <div className='h-screen bg-gradient-dark flex flex-col'>
+      {/* Header */}
+      <header className='bg-dark-200 border-b border-dark-300 px-6 py-4 flex items-center gap-4 shadow-dark'>
+        <Link 
+          to={"/home"} 
+          className='text-dark-600 hover:text-white transition-colors p-2 rounded-lg hover:bg-dark-300'
+        >
+          <FaAngleLeft size={20} />
+        </Link>
+        
+        <Avatar
+          width={45}
+          height={45}
+          imageUrl={dataUser?.profile_pic}
+          name={dataUser?.name}
+          userId={dataUser?._id}
+        />
+        
+        <div className='flex-1'>
+          <h3 className='font-semibold text-lg text-white mb-1 truncate'>
+            {dataUser?.name}
+          </h3>
+          <p className='text-sm'>
+            {dataUser.online ? (
+              <span className='text-accent-cyan flex items-center gap-1'>
+                <span className='w-2 h-2 bg-accent-cyan rounded-full'></span>
+                Online
+              </span>
+            ) : (
+              <span className='text-dark-600'>Offline</span>
+            )}
+          </p>
+        </div>
+      </header>
 
-          </div>
-        </header>
-
-        <section className='h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative bg-slate-200 bg-opacity-50'>
-
-
-
-          <div className='flex flex-col gap-2 py-2 mx-2' ref={currentMessage}>
-            {
-              allMessage.map((msg, index) => {
-                return (
-                  <div key={msg?.msgByUserId} className={` p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-lg ${user._id === msg?.msgByUserId ? "ml-auto bg-teal-100" : "bg-white"}`}>
-                    <div className='w-full relative'>
-                      {
-                        msg?.imageUrl && (
-                          <img
-                            src={msg?.imageUrl}
-                            className='w-full h-full object-scale-down'
-                          />
-                        )
-                      }
-                      {
-                        msg?.videoUrl && (
-                          <video
-                            src={msg?.videoUrl}
-                            className="w-full h-full object-scale-down border-2 border-gray-300 rounded-lg"
-                            controls
-                          />
-                        )
-                      }
-                    </div>
-                    <p className='px-2 text-xl'>{msg.text}</p>
-                    <p className='text-xs ml-auto w-fit'>{moment(msg.createdAt).format('hh:mm')}</p>
-                  </div>
-                )
-              })
-            }
-          </div>
-
-
-          {
-            <>
-              {message.imageUrl && (
-                <div className='w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
-                  <div className='w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600' onClick={handleClearUploadImage}>
-                    <IoClose size={30} />
-                  </div>
-                  <div className='bg-white p-3'>
-                    <img
-                      src={message.imageUrl}
-                      alt='uploadImage'
-                      className='aspect-square w-full h-full max-w-sm m-2 object-scale-down cursor-pointer'
-                      onClick={openModal}
-                    />
-                  </div>
-                </div>
-              )}
-              <Modal
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                contentLabel="Image Modal"
-                className="modal"
-                overlayClassName="overlay"
-              >
-                <button onClick={closeModal} className="modal-close">
-                  <IoClose size={30} />
-                </button>
-                <img
-                  src={message.imageUrl}
-                  alt='uploadImage'
-                  className='w-full h-full object-contain'
-                />
-              </Modal>
-            </>
-          }
-
-          {
-            message.videoUrl && (
-              <div className='w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
-                <div className='w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600' onClick={handleClearUploadVideo}>
-                  <IoClose size={30} />
-                </div>
-                <div className='bg-white p-3'>
-                  <video
-                    src={message.videoUrl}
-                    className='aspect-square w-full h-full max-w-sm m-2 object-scale-down'
-                    controls
-                    muted
-                    autoPlay
-                  />
-                </div>
-              </div>
-            )
-          }
-
-          {
-            loading && (
-              <div className='w-full h-full flex sticky bottom-0 justify-center items-center'>
-                <Loading />
-              </div>
-            )
-          }
-        </section>
-
-        <section className='h-16 bg-white flex items-center px-4'>
-          <div className='relative '>
-            <button onClick={handleUploadImageVideoOpen} className='flex justify-center items-center w-11 h-11 rounded-full hover:bg-primary hover:text-white'>
-              <FaPlus size={20} />
-            </button>
-
-            {/**video and image */}
-            {
-              openImageVideoUpload && (
-                <div className='bg-white shadow rounded absolute bottom-14 w-36 p-2'>
-                  <form>
-                    <label htmlFor='uploadImage' className='flex items-center p-2 px-3 gap-3 hover:bg-slate-200 cursor-pointer'>
-                      <div className='text-primary'>
-                        <FaImage size={18} />
+      {/* Messages Area */}
+      <section className='flex-1 overflow-hidden bg-dark-100 relative'>
+        {/* Background Pattern */}
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.02\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"
+          }}
+        ></div>
+        
+        <div className='h-full overflow-y-auto scrollbar-thin scrollbar-thumb-dark-400 scrollbar-track-dark-200 p-4 relative z-10'>
+          <div className='flex flex-col gap-3' ref={currentMessage}>
+            {allMessage.map((msg, index) => {
+              const isOwnMessage = user._id === msg?.msgByUserId;
+              
+              return (
+                <div 
+                  key={index} 
+                  className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`
+                    max-w-[80%] md:max-w-[60%] lg:max-w-[50%] 
+                    p-3 rounded-2xl shadow-dark
+                    ${isOwnMessage 
+                      ? 'bg-gradient-primary text-white rounded-br-md' 
+                      : 'bg-dark-200 text-white rounded-bl-md border border-dark-300'
+                    }
+                  `}>
+                    {/* Media Content */}
+                    {msg?.imageUrl && (
+                      <div className='mb-2'>
+                        <img
+                          src={msg?.imageUrl}
+                          className='w-full h-auto rounded-xl object-cover cursor-pointer hover:opacity-90 transition-opacity'
+                          onClick={() => openImageModal(msg.imageUrl)}
+                          alt="Shared image"
+                        />
                       </div>
-                      <p>Image</p>
-                    </label>
-                    <label htmlFor='uploadVideo' className='flex items-center p-2 px-3 gap-3 hover:bg-slate-200 cursor-pointer'>
-                      <div className='text-purple-500'>
-                        <FaVideo size={18} />
+                    )}
+                    
+                    {msg?.videoUrl && (
+                      <div className='mb-2'>
+                        <video
+                          src={msg?.videoUrl}
+                          className="w-full h-auto rounded-xl object-cover"
+                          controls
+                        />
                       </div>
-                      <p>Video</p>
-                    </label>
-
-                    <input
-                      type='file'
-                      id='uploadImage'
-                      onChange={handleUploadImage}
-                      className='hidden'
-                    />
-
-                    <input
-                      type='file'
-                      id='uploadVideo'
-                      onChange={handleUploadVideo}
-                      className='hidden'
-                    />
-                  </form>
+                    )}
+                    
+                    {/* Text Content */}
+                    {msg.text && (
+                      <p className='text-sm leading-relaxed mb-1'>
+                        {msg.text}
+                      </p>
+                    )}
+                    
+                    {/* Timestamp */}
+                    <p className={`text-xs mt-2 ${isOwnMessage ? 'text-blue-100' : 'text-dark-600'}`}>
+                      {moment(msg.createdAt).format('hh:mm A')}
+                    </p>
+                  </div>
                 </div>
               )
-            }
+            })}
+          </div>
+        </div>
 
+        {/* Image Preview Modal (for new messages being composed) */}
+        {message.imageUrl && (
+          <div className='absolute inset-0 bg-dark-100 bg-opacity-95 flex items-center justify-center z-40'>
+            <button
+              onClick={handleClearUploadImage}
+              className='absolute top-4 right-4 text-white hover:text-red-400 transition-colors bg-dark-200 rounded-full p-2 z-50'
+            >
+              <IoClose size={24} />
+            </button>
+            <div className='max-w-2xl max-h-2xl p-4'>
+              <img
+                src={message.imageUrl}
+                alt='Preview'
+                className='w-full h-auto rounded-xl shadow-glow'
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Video Preview Modal (for new messages being composed) */}
+        {message.videoUrl && (
+          <div className='absolute inset-0 bg-dark-100 bg-opacity-95 flex items-center justify-center z-40'>
+            <button
+              onClick={handleClearUploadVideo}
+              className='absolute top-4 right-4 text-white hover:text-red-400 transition-colors bg-dark-200 rounded-full p-2 z-50'
+            >
+              <IoClose size={24} />
+            </button>
+            <div className='max-w-2xl max-h-2xl p-4'>
+              <video
+                src={message.videoUrl}
+                className='w-full h-auto rounded-xl shadow-glow'
+                controls
+                muted
+                autoPlay
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Loading Overlay */}
+        {loading && (
+          <div className='absolute inset-0 bg-dark-100 bg-opacity-80 flex items-center justify-center z-30'>
+            <div className='bg-dark-200 rounded-xl p-6 shadow-glow'>
+              <Loading />
+              <p className='text-white text-center mt-2'>Uploading...</p>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Full Screen Image Modal (for viewing sent/received images) */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Image Modal"
+        className="fixed inset-0 flex items-center justify-center p-4"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-90"
+        style={{
+          overlay: {
+            zIndex: 9999
+          },
+          content: {
+            zIndex: 10000
+          }
+        }}
+      >
+        <button 
+          onClick={closeModal} 
+          className="absolute top-4 right-4 text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2 transition-colors z-[10001]"
+        >
+          <IoClose size={24} />
+        </button>
+        {modalImage && (
+          <img
+            src={modalImage}
+            alt='Full size'
+            className='max-w-full max-h-full object-contain rounded-lg'
+          />
+        )}
+      </Modal>
+
+      {/* Input Area */}
+      <section className='bg-dark-200 border-t border-dark-300 p-4'>
+        <div className='flex items-center gap-3'>
+          {/* Action Buttons */}
+          <div className='relative flex gap-2'>
+            {/* File Upload Button */}
+            <button 
+              onClick={handleUploadImageVideoOpen} 
+              className='w-10 h-10 bg-dark-300 hover:bg-primary-500 text-dark-600 hover:text-white rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-glow'
+            >
+              <FaPlus size={18} />
+            </button>
+
+            {/* Emoji Picker Button */}
+            <button 
+              onClick={handleEmojiPickerOpen} 
+              className='w-10 h-10 bg-dark-300 hover:bg-accent-cyan text-dark-600 hover:text-white rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-glow'
+            >
+              <BsEmojiSmile size={18} />
+            </button>
+
+            {/* File Upload Menu */}
+            {openImageVideoUpload && (
+              <div className='absolute bottom-12 left-0 bg-dark-200 border border-dark-300 rounded-xl shadow-dark p-2 z-20 min-w-[140px]'>
+                <label 
+                  htmlFor='uploadImage' 
+                  className='flex items-center gap-3 p-3 hover:bg-dark-300 rounded-lg cursor-pointer transition-colors'
+                >
+                  <FaImage className='text-primary-400' size={16} />
+                  <span className='text-white text-sm'>Image</span>
+                </label>
+                
+                <label 
+                  htmlFor='uploadVideo' 
+                  className='flex items-center gap-3 p-3 hover:bg-dark-300 rounded-lg cursor-pointer transition-colors'
+                >
+                  <FaVideo className='text-purple-400' size={16} />
+                  <span className='text-white text-sm'>Video</span>
+                </label>
+
+                <input
+                  type='file'
+                  id='uploadImage'
+                  onChange={handleUploadImage}
+                  accept="image/*"
+                  className='hidden'
+                />
+
+                <input
+                  type='file'
+                  id='uploadVideo'
+                  onChange={handleUploadVideo}
+                  accept="video/*"
+                  className='hidden'
+                />
+              </div>
+            )}
+
+            {/* Emoji Picker */}
+            {openEmojiPicker && (
+              <div className='absolute bottom-12 left-0 z-20'>
+                <EmojiPicker
+                  onEmojiClick={handleEmojiClick}
+                  width={320}
+                  height={400}
+                  theme="dark"
+                />
+              </div>
+            )}
           </div>
 
-          {/**input box */}
-          <form className='h-full w-full flex gap-2' onSubmit={handleSendMessage}>
+          {/* Message Input Form */}
+          <form onSubmit={handleSendMessage} className='flex-1 flex items-center gap-3'>
             <input
               type='text'
-              placeholder='Type here message...'
-              className='py-1 px-4 outline-none w-full h-full'
+              placeholder='Type a message...'
+              className='flex-1 bg-dark-300 border border-dark-400 rounded-xl px-4 py-3 text-white placeholder-dark-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200'
               value={message.text}
               onChange={handleOnChange}
             />
-            <button className='text-primary hover:text-secondary text-green-700'>
-              <IoMdSend size={28} />
+            
+            <button 
+              type='submit'
+              disabled={!message.text.trim() && !message.imageUrl && !message.videoUrl}
+              className='w-10 h-10 bg-gradient-primary text-white rounded-full flex items-center justify-center hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              <IoMdSend size={18} />
             </button>
           </form>
-
-        </section>
-      </div>
-    </>
+        </div>
+      </section>
+    </div>
   )
 }
 
