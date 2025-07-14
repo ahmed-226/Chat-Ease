@@ -108,19 +108,19 @@ const login = async (req,res) => {
 
 const userDetials=async (req, res) => {
     try {
-
-
         const token = req.cookies.token || ""
-        // console.log(token);
 
-        const user=await verifyToken(token)
+        const user = await verifyToken(token)
+        const userId = user.id || user._id;
 
-        if (user.id) {
-
+        if (userId) {
+            // Fetch fresh user data from database
+            const userData = await User.findById(userId).select('-password');
             
             return res.status(200).json({
                 message: "user Details",
-                data: user
+                data: userData,
+                success: true
             })
         }
 
@@ -128,7 +128,6 @@ const userDetials=async (req, res) => {
             message: "Invalid Token",
             error: true
         })
-
 
     } catch (error) {
         return res.status(400).json({
@@ -154,19 +153,35 @@ const logout = async (req, res) => {
 
 }
 
-const updateUser=async (req, res) => {
+const updateUser = async (req, res) => {
     try {
         const { name, profile_pic } = req.body
         const token = req.cookies.token || ""
 
-        const user = await verifyToken(token)
+        console.log('Update request received:', { name, profile_pic: profile_pic ? 'URL provided' : 'No URL' });
+        console.log('Token:', token ? 'Token exists' : 'No token');
 
-        if (user._id) {
-            const updateUser = await User.findByIdAndUpdate(user._id, { name, profile_pic }, { new: true })
+        const user = await verifyToken(token)
+        console.log('Verified user:', user?.id || user?._id);
+
+        // Fix: Use user.id instead of user._id (depends on how verifyToken returns the data)
+        const userId = user.id || user._id;
+        
+        if (userId) {
+            const updatedUser = await User.findByIdAndUpdate(
+                userId, 
+                { 
+                    ...(name && { name }), 
+                    ...(profile_pic !== undefined && { profile_pic }) 
+                }, 
+                { new: true, runValidators: true }
+            ).select('-password');
+
+            console.log('Updated user:', updatedUser);
 
             return res.status(200).json({
                 message: "User updated successfully",
-                data: updateUser,
+                data: updatedUser,
                 success: true
             })
         }
@@ -177,12 +192,12 @@ const updateUser=async (req, res) => {
         })
 
     } catch (error) {
-        return res.status(400).json({
-            message: error.message || error,
+        console.error('Update user error:', error);
+        return res.status(500).json({
+            message: error.message || "Internal server error",
             error: true
         })
     }
- 
 }
 
 const searchUser = async (req, res) => {
